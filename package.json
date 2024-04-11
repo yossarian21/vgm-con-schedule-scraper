@@ -1,0 +1,27 @@
+{
+    "name": "vgm-con-schedule-scraper",
+    "version": "1.0.0",
+    "main": "index.js",
+    "author": "Durand Van Arnem <codecraftllc@gmail.com>",
+    "license": "MIT",
+    "packageManager": "yarn@4.1.1",
+    "engines": {
+        "node": ">=20"
+    },
+    "scripts": {
+        "start": "ts-node src/index.ts"
+    },
+    "dependencies": {
+        "@tsconfig/node20": "^20.1.4",
+        "@types/node": "^20.12.7",
+        "cheerio": "^1.0.0-rc.12",
+        "ical-generator": "^7.0.0",
+        "luxon": "^3.4.4",
+        "prettier": "^3.2.5",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.4.5"
+    },
+    "devDependencies": {
+        "@types/luxon": "^3"
+    }
+}
