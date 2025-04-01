@@ -3,8 +3,9 @@ import * as cheerio from 'cheerio';
 import ical from 'ical-generator';
 import { DateTime } from 'luxon';
 
-const SCHEDULE_URL = 'https://vgmcon.org/2024-schedule/';
-const START_DATE = '2024-04-19';
+const SCHEDULE_URL = 'https://vgmcon.org/schedule/';
+const START_DATE = '2025-04-10';
+const OUTPUT_FILE_NAME = 'vgmcon2025.ics';
 
 async function loadHtml() {
     try {
@@ -38,8 +39,9 @@ async function main() {
         for (const event of events) {
             const $event = $(event);
             const header = $event.children('.title').text();
-            let [range, title] = header.split(/\]\s*/);
-            const [start, end] = range.replace('[', '').split(/\s*-\s*/);
+            const title = header.replace(/^\[.+\]\s*/, '');
+            const timeframe = $event.find('.data .session').text();
+            const [start, end] = timeframe.replace(/^\D+/, '').split(/\s*-\s*/);
             const location = $event.find('.quick_info .presenter').text();
             const presenter = $event.find('.quick_info .location').text();
             const description = $event.find('.details .description').text();
@@ -47,13 +49,13 @@ async function main() {
             // Friday 19 Apr 2024
             const calEv = {
                 start: DateTime.fromFormat(
-                    `${dayStr} ${start}m`,
-                    'EEEE dd LLL yyyy h:mma',
+                    `${dayStr} ${start}`,
+                    'EEEE dd LLL yyyy h:mm a',
                     { zone: 'America/Chicago' }
                 ),
                 end: DateTime.fromFormat(
-                    `${dayStr} ${end}m`,
-                    'EEEE dd LLL yyyy h:mma',
+                    `${dayStr} ${end}`,
+                    'EEEE dd LLL yyyy h:mm a',
                     { zone: 'America/Chicago' }
                 ),
                 title,
@@ -62,6 +64,8 @@ async function main() {
                 description,
                 type,
             };
+
+            // console.log(JSON.stringify(calEv));
             if (start.endsWith('p') && end.endsWith('a')) {
                 calEv.end = calEv.end.plus({ day: 1 });
             }
@@ -81,7 +85,7 @@ async function main() {
             categories: e.type ? [{ name: e.type }] : [],
         })),
     });
-    await fs.writeFile('vgmcon2024.ics', cal.toString(), 'utf-8');
+    await fs.writeFile(OUTPUT_FILE_NAME, cal.toString(), 'utf-8');
 }
 
 main().catch((err) => {
